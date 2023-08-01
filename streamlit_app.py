@@ -17,7 +17,7 @@ def obtener_respuesta_api(texto):
         headers=headers,
         data=json.dumps(data)
     )
-    return response.json()
+    return response.json().get('outputs', {}).get('text_output_4', {}).get('value', 'Error: No se recibió una respuesta válida')
 
 def main():
     st.title("Chat con API de The Forge AI")
@@ -33,7 +33,7 @@ def main():
         if mensaje_usuario:
             historial_mensajes.append(("Tú:", mensaje_usuario))
             respuesta = obtener_respuesta_api(mensaje_usuario)
-            historial_mensajes.append(("Bot:", respuesta['response']))
+            historial_mensajes.append(("Bot:", respuesta))
 
     # Mostrar el historial de mensajes en la app
     if historial_mensajes:
