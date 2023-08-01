@@ -36,8 +36,8 @@ if st.button("Enviar"):
 
         if response.status_code == 200:
             response_data = response.json()
-            st.write("Respuesta completa de la API:", response_data)
-            # Aquí puedes agregar el código para extraer la respuesta del bot de la respuesta de la API
+            bot_response = response_data.get('user_outputs', {}).get('text_output_5', {}).get('value', '')
+            st.write("Respuesta del bot:", bot_response)
         else:
             st.write("Ha ocurrido un error al procesar la solicitud.")
     else:
