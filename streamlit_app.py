@@ -1,65 +1,75 @@
 import streamlit as st
-import requests
-import json
+from streamlit_chat import Chat
 
-# Configura tu API key
+# Set up the chatbot
+st.title("The Forge AI Chatbot")
+chat = Chat()
+
+# Define the API endpoint and headers
+endpoint = "https://api.theforgeai.com/v1/apps/64a8eeb6bd770b33fdae84fc/view"
 headers = {
     "X-API-KEY": "sk_RxYG4kgIdeL6N9KdXBD5JIHwhMpPr_FKOfIetVj2y40",
-    "Content-Type":"application/json"
+    # Add Content-Type header for sending JSON data
+    "Content-Type": "application/json"
 }
 
-# URL base de la API
-base_url = "https://api.theforgeai.com/v1/apps/64a8eeb6bd770b33fdae84fc/view"
+# Define the initial state of the chatbot
+state = {}
 
-# Configuración de la aplicación Streamlit
-st.title("Chatbot basado en TheForgeAI")
+# Function to handle incoming messages from the user
+def handle_message(message):
+    # Parse the message as JSON
+    try:
+        message_dict = json.loads(message)
+    except ValueError:
+        return None
 
-# Inicializa el historial del chat en el estado de la sesión
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+    # Check if the message contains text input
+    if "text_input_3" in message_dict:
+        # Extract the text input value
+        text_input = message_dict["text_input_3"]["value"]
 
-# Input del usuario
-user_input = st.text_input("Escribe tu mensaje:")
-
-# Cuando el usuario presiona el botón "Enviar", se envía la solicitud a la API
-if st.button("Enviar"):
-    if user_input:
-        # Agrega el mensaje del usuario al historial del chat
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
-
-        data = {
-            "user_inputs": {
-                "text_input_3": {
-                    "value": user_input
-                }
-            }
-        }
-
+        # Make a request to the API with the extracted text input
         response = requests.post(
-            f"{base_url}/run",
+            endpoint,
             headers=headers,
-            data=json.dumps(data)
+            data=json.dumps({"user_inputs": message_dict})
         )
 
-        if response.status_code == 200:
-            response_data = response.json()
-            bot_response = response_data.get('user_outputs', {}).get('text_output_5', {}).get('value', '')
-            
-            # Agrega la respuesta del bot al historial del chat
-            st.session_state.chat_history.append({"role": "bot", "content": bot_response})
-        else:
-            st.write("Ha ocurrido un error al procesar la solicitud.")
-        
-        # Borra el contenido del cuadro de texto
-        user_input = ""
-    else:
-        st.write("Por favor, escribe un mensaje.")
+        # Print the response from the API
+        print(response.json())
 
-# Muestra el historial del chat
-for chat in st.session_state.chat_history:
-    if chat["role"] == "user":
-        with st.chat_message("user"):
-            st.markdown(chat["content"])
-    else:
-        with st.chat_message("assistant"):
-            st.markdown(chat["content"])
+# Create the Streamlit app
+app = st.App(
+    title="The Forge AI Chatbot",
+    style={"background-color": "#f2f2f2", "font-family": "Arial, sans-serif"},
+    layout="wide"
+)
+
+# Add a text input field to the app
+text_input = st.text_input("Enter your message here", "")
+
+# Add a button to send the message to the API
+button = st.button("Send Message")
+
+# Define the callback function for when the button is clicked
+@button.click
+def send_message():
+    # Get the current text input value
+    text_input_value = text_input.value
+
+    # Build the JSON payload for the API request
+    payload = json.dumps({"user_inputs": {"text_input_3": {"value": text_input_value}}})
+
+    # Make the API request
+    response = requests.post(
+        endpoint,
+        headers=headers,
+        data=payload
+    )
+
+    # Print the response from the API
+    print(response.json())
+
+# Run the app
+app.run()
