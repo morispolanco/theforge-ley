@@ -14,8 +14,9 @@ base_url = "https://api.theforgeai.com/v1/apps/64a8eeb6bd770b33fdae84fc/view"
 # Configuración de la aplicación Streamlit
 st.title("Chatbot basado en TheForgeAI")
 
-# Creación de una lista para almacenar los mensajes del chat
-chat_history = []
+# Inicializa el historial del chat en el estado de la sesión
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = []
 
 # Input del usuario
 user_input = st.text_input("Escribe tu mensaje:")
@@ -24,7 +25,7 @@ user_input = st.text_input("Escribe tu mensaje:")
 if st.button("Enviar"):
     if user_input:
         # Agrega el mensaje del usuario al historial del chat
-        chat_history.append({"user": user_input})
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
 
         data = {
             "user_inputs": {
@@ -45,15 +46,20 @@ if st.button("Enviar"):
             bot_response = response_data.get('user_outputs', {}).get('text_output_5', {}).get('value', '')
             
             # Agrega la respuesta del bot al historial del chat
-            chat_history.append({"bot": bot_response})
+            st.session_state.chat_history.append({"role": "bot", "content": bot_response})
         else:
             st.write("Ha ocurrido un error al procesar la solicitud.")
+        
+        # Borra el contenido del cuadro de texto
+        user_input = ""
     else:
         st.write("Por favor, escribe un mensaje.")
 
 # Muestra el historial del chat
-for chat in chat_history:
-    if "user" in chat:
-        st.write("Usuario: ", chat["user"])
+for chat in st.session_state.chat_history:
+    if chat["role"] == "user":
+        with st.chat_message("user"):
+            st.markdown(chat["content"])
     else:
-        st.write("Bot: ", chat["bot"])
+        with st.chat_message("assistant"):
+            st.markdown(chat["content"])
