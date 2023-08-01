@@ -1,5 +1,6 @@
 import streamlit as st
-from streamlit_chat import Chat as sc
+import streamlit_chat as sc
+
 
 # Set up the chatbot
 st.title("The Forge AI Chatbot")
