@@ -24,7 +24,12 @@ def send_message(message):
         data=json.dumps(data)
     )
 
-    return response.json()
+    # Extract 'message' from the response
+    response_json = response.json()
+    if 'message' in response_json:
+      return response_json['message']
+    else:
+      return "No message in response"
 
 # Streamlit app
 st.title('Streamlit Chatbot')
