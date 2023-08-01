@@ -25,27 +25,21 @@ def main():
     # Inicializar la variable donde se guardará el historial de mensajes
     historial_mensajes = []
 
-    # Contador para generar claves únicas para cada widget
-    contador_claves = 0
+    # Cuadro de texto para que el usuario escriba su mensaje
+    mensaje_usuario = st.text_input("Escribe tu mensaje:")
 
-    # Bucle para mantener la conversación con el usuario
-    while True:
-        mensaje_usuario = st.text_input("Escribe tu mensaje:", key=f'input_msg_{contador_claves}')
-
-        # Si el usuario escribe un mensaje, agregarlo al historial y obtener la respuesta de la API
+    # Botón para enviar el mensaje
+    if st.button("Enviar"):
         if mensaje_usuario:
             historial_mensajes.append(("Tú:", mensaje_usuario))
             respuesta = obtener_respuesta_api(mensaje_usuario)
             historial_mensajes.append(("Bot:", respuesta['response']))
 
-        # Mostrar el historial de mensajes en la app
-        if historial_mensajes:
-            st.text("Historial de mensajes:")
-            for remitente, mensaje in historial_mensajes:
-                st.text(f"{remitente} {mensaje}")
-
-        # Incrementar el contador de claves
-        contador_claves += 1
+    # Mostrar el historial de mensajes en la app
+    if historial_mensajes:
+        st.text("Historial de mensajes:")
+        for remitente, mensaje in historial_mensajes:
+            st.text(f"{remitente} {mensaje}")
 
 if __name__ == "__main__":
     main()
