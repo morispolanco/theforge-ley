@@ -27,7 +27,7 @@ def main():
 
     # Bucle para mantener la conversación con el usuario
     while True:
-        mensaje_usuario = st.text_input("Escribe tu mensaje:", "")
+        mensaje_usuario = st.text_input("Escribe tu mensaje:", key='input_msg')
 
         # Si el usuario escribe un mensaje, agregarlo al historial y obtener la respuesta de la API
         if mensaje_usuario:
